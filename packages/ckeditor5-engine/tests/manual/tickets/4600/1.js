@@ -36,15 +36,19 @@ class WidgetEditing extends Plugin {
 
 				const ignoredContainer = writer.createContainerElement( 'div', { class: 'ignored-container' } );
 				const ignoredContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
-				const ignoredContainerButton = writer.createElement( 'button' );
+				const ignoredContainerButton = writer.createContainerElement( 'button' );
+				const ignoredContainerButtonText = writer.createText( 'ignored -- CLICK!' );
 
+				writer.insert( writer.createPositionAt( ignoredContainerButton, 0 ), ignoredContainerButtonText );
 				writer.insert( writer.createPositionAt( ignoredContainer, 0 ), ignoredContainerInput );
 				writer.insert( writer.createPositionAt( ignoredContainer, 1 ), ignoredContainerButton );
 
 				const regularContainer = writer.createContainerElement( 'div', { class: 'regular-container' } );
 				const regularContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
-				const regularContainerButton = writer.createEmptyElement( 'button' );
+				const regularContainerButton = writer.createContainerElement( 'button' );
+				const regularContainerButtonText = writer.createText( 'regular -- CLICK!' );
 
+				writer.insert( writer.createPositionAt( regularContainerButton, 0 ), regularContainerButtonText );
 				writer.insert( writer.createPositionAt( regularContainer, 0 ), regularContainerInput );
 				writer.insert( writer.createPositionAt( regularContainer, 1 ), regularContainerButton );
 
