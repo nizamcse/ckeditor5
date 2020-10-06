@@ -34,7 +34,10 @@ class WidgetEditing extends Plugin {
 			view: ( modelElement, { writer } ) => {
 				const widgetElement = writer.createContainerElement( 'section', { class: 'widget-element' } );
 
-				const ignoredContainer = writer.createContainerElement( 'div', { class: 'ignored-container' } );
+				const ignoredContainer = writer.createContainerElement( 'div', {
+					class: 'ignored-container',
+					'data-cke-ignore-events': 'true'
+				} );
 				const ignoredContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
 				const ignoredContainerButton = writer.createContainerElement( 'button' );
 				const ignoredContainerButtonText = writer.createText( 'ignored -- CLICK!' );
