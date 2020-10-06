@@ -24,44 +24,42 @@ class WidgetEditing extends Plugin {
 			isObject: true,
 			allowWhere: '$block'
 		} );
-
-		schema.register( 'ignoredContainer', {
-			isLimit: true,
-			allowIn: 'widgetElement',
-			allowContentOf: '$root'
-		} );
-
-		schema.register( 'regularContainer', {
-			isLimit: true,
-			allowIn: 'widgetElement',
-			allowContentOf: '$root'
-		} );
 	}
 
 	_defineConverters() {
 		const conversion = this.editor.conversion;
 
-		conversion.elementToElement( {
+		conversion.for( 'downcast' ).elementToElement( {
+			model: 'widgetElement',
+			view: ( modelElement, { writer } ) => {
+				const widgetElement = writer.createContainerElement( 'section', { class: 'widget-element' } );
+
+				const ignoredContainer = writer.createContainerElement( 'div', { class: 'ignored-container' } );
+				const ignoredContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
+				const ignoredContainerButton = writer.createElement( 'button' );
+
+				writer.insert( writer.createPositionAt( ignoredContainer, 0 ), ignoredContainerInput );
+				writer.insert( writer.createPositionAt( ignoredContainer, 1 ), ignoredContainerButton );
+
+				const regularContainer = writer.createContainerElement( 'div', { class: 'regular-container' } );
+				const regularContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
+				const regularContainerButton = writer.createEmptyElement( 'button' );
+
+				writer.insert( writer.createPositionAt( regularContainer, 0 ), regularContainerInput );
+				writer.insert( writer.createPositionAt( regularContainer, 1 ), regularContainerButton );
+
+				writer.insert( writer.createPositionAt( widgetElement, 0 ), ignoredContainer );
+				writer.insert( writer.createPositionAt( widgetElement, 1 ), regularContainer );
+
+				return widgetElement;
+			}
+		} );
+
+		conversion.for( 'upcast' ).elementToElement( {
 			model: 'widgetElement',
 			view: {
 				name: 'section',
 				classes: 'widget-element'
-			}
-		} );
-
-		conversion.elementToElement( {
-			model: 'ignoredContainer',
-			view: {
-				name: 'div',
-				classes: 'ignored-container'
-			}
-		} );
-
-		conversion.elementToElement( {
-			model: 'regularContainer',
-			view: {
-				name: 'div',
-				classes: 'regular-container'
 			}
 		} );
 	}
