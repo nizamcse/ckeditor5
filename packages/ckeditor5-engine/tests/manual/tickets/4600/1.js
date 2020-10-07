@@ -9,9 +9,16 @@ import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor'
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-
-import { toWidget } from '@ckeditor/ckeditor5-widget/src/utils';
 import Widget from '@ckeditor/ckeditor5-widget/src/widget';
+import { toWidget } from '@ckeditor/ckeditor5-widget/src/utils';
+
+import ClickObserver from '@ckeditor/ckeditor5-engine/src/view/observer/clickobserver';
+import CompositionObserver from '@ckeditor/ckeditor5-engine/src/view/observer/compositionobserver';
+import FocusObserver from '@ckeditor/ckeditor5-engine/src/view/observer/focusobserver';
+import InputObserver from '@ckeditor/ckeditor5-engine/src/view/observer/inputobserver';
+import KeyObserver from '@ckeditor/ckeditor5-engine/src/view/observer/keyobserver';
+import MouseEventsObserver from '@ckeditor/ckeditor5-table/src/tablemouse/mouseeventsobserver';
+import MouseObserver from '@ckeditor/ckeditor5-engine/src/view/observer/mouseobserver';
 
 class SimpleWidgetEditing extends Plugin {
 	static get requires() {
@@ -19,9 +26,9 @@ class SimpleWidgetEditing extends Plugin {
 	}
 
 	init() {
-		console.log( 'SimpleWidgetEditing#init() got called' );
 		this._defineSchema();
 		this._defineConverters();
+		this._addObservers();
 	}
 
 	_defineSchema() {
@@ -80,13 +87,33 @@ class SimpleWidgetEditing extends Plugin {
 			return simpleWidgetContainer;
 		}
 	}
-}
 
-class SimpleWidgetUI extends Plugin {
-	init() {
-		console.log( 'SimpleWidgetUI#init() got called' );
+	_addObservers() {
+		const view = this.editor.editing.view;
+
+		const observers = new Map( [
+			[ ClickObserver, [ 'click' ] ],
+			[ CompositionObserver, [ 'compositionstart', 'compositionupdate', 'compositionend' ] ],
+			[ FocusObserver, [ 'focus', 'blur' ] ],
+			[ InputObserver, [ 'beforeinput' ] ],
+			[ KeyObserver, [ 'keydown', 'keyup' ] ],
+			[ MouseEventsObserver, [ 'mousemove', 'mouseup', 'mouseleave' ] ],
+			[ MouseObserver, [ 'mousedown' ] ]
+		] );
+
+		observers.forEach( ( events, observer ) => {
+			view.addObserver( observer );
+
+			events.forEach( eventName => {
+				this.listenTo( view.document, eventName, event => {
+					console.log( eventName, event );
+				} );
+			} );
+		} );
 	}
 }
+
+class SimpleWidgetUI extends Plugin {}
 
 class SimpleWidget extends Plugin {
 	static get requires() {
