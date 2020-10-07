@@ -22,7 +22,6 @@ class SimpleWidgetEditing extends Plugin {
 		console.log( 'SimpleWidgetEditing#init() got called' );
 		this._defineSchema();
 		this._defineConverters();
-		this._defineListener();
 	}
 
 	_defineSchema() {
@@ -55,22 +54,22 @@ class SimpleWidgetEditing extends Plugin {
 			model: 'simpleWidgetElement',
 			view: {
 				name: 'section',
-				classes: 'simple-widget-element'
+				classes: 'simple-widget-container'
 			}
 		} );
 
 		function createView( modelElement, { writer } ) {
 			const simpleWidgetContainer = writer.createContainerElement( 'section', { class: 'simple-widget-container' } );
-			const simpleWidgetElement = writer.createRawElement( 'section', { class: 'simple-widget-element' }, domElement => {
+			const simpleWidgetElement = writer.createRawElement( 'div', { class: 'simple-widget-element' }, domElement => {
 				domElement.innerHTML = `
-					<fieldset class="ignored-container" data-cke-ignore-events="true">
+					<fieldset data-cke-ignore-events="true">
 						<legend>Ignored container with <strong>data-cke-ignore-events="true"</strong></legend>
-						<input type="text">
+						<input>
 						<button>Click!</button>
 					</fieldset>
-					<fieldset class="regular-container">
+					<fieldset>
 						<legend>Regular container</legend>
-						<input type="text">
+						<input>
 						<button>Click!</button>
 					</fieldset>
 				`;
@@ -80,15 +79,6 @@ class SimpleWidgetEditing extends Plugin {
 
 			return simpleWidgetContainer;
 		}
-	}
-
-	_defineListener() {
-		this.editor.model.document.on( 'change', () => {
-			console.log( 'change event' );
-		} );
-		this.editor.model.document.on( 'change:data', () => {
-			console.log( 'change:data event' );
-		} );
 	}
 }
 
