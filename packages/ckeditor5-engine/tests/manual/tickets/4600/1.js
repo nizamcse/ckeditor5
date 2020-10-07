@@ -106,7 +106,7 @@ class SimpleWidgetEditing extends Plugin {
 
 			events.forEach( eventName => {
 				this.listenTo( view.document, eventName, event => {
-					console.log( eventName, event );
+					console.log( `Default observer captured ${ event.name } event.` );
 				} );
 			} );
 		} );
