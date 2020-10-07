@@ -10,17 +10,25 @@ import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 
-class WidgetEditing extends Plugin {
+import { toWidget } from '@ckeditor/ckeditor5-widget/src/utils';
+import Widget from '@ckeditor/ckeditor5-widget/src/widget';
+
+class SimpleWidgetEditing extends Plugin {
+	static get requires() {
+		return [ Widget ];
+	}
+
 	init() {
-		console.log( 'WidgetEditing#init() got called' );
+		console.log( 'SimpleWidgetEditing#init() got called' );
 		this._defineSchema();
 		this._defineConverters();
+		this._defineListener();
 	}
 
 	_defineSchema() {
 		const schema = this.editor.model.schema;
 
-		schema.register( 'widgetElement', {
+		schema.register( 'simpleWidgetElement', {
 			isObject: true,
 			allowWhere: '$block'
 		} );
@@ -29,64 +37,76 @@ class WidgetEditing extends Plugin {
 	_defineConverters() {
 		const conversion = this.editor.conversion;
 
-		conversion.for( 'downcast' ).elementToElement( {
-			model: 'widgetElement',
+		conversion.for( 'editingDowncast' ).elementToElement( {
+			model: 'simpleWidgetElement',
 			view: ( modelElement, { writer } ) => {
-				const widgetElement = writer.createContainerElement( 'section', { class: 'widget-element' } );
+				const widgetElement = createView( modelElement, { writer } );
 
-				const ignoredContainer = writer.createContainerElement( 'div', {
-					class: 'ignored-container',
-					'data-cke-ignore-events': 'true'
-				} );
-				const ignoredContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
-				const ignoredContainerButton = writer.createContainerElement( 'button' );
-				const ignoredContainerButtonText = writer.createText( 'ignored -- CLICK!' );
-
-				writer.insert( writer.createPositionAt( ignoredContainerButton, 0 ), ignoredContainerButtonText );
-				writer.insert( writer.createPositionAt( ignoredContainer, 0 ), ignoredContainerInput );
-				writer.insert( writer.createPositionAt( ignoredContainer, 1 ), ignoredContainerButton );
-
-				const regularContainer = writer.createContainerElement( 'div', { class: 'regular-container' } );
-				const regularContainerInput = writer.createEmptyElement( 'input', { type: 'text' } );
-				const regularContainerButton = writer.createContainerElement( 'button' );
-				const regularContainerButtonText = writer.createText( 'regular -- CLICK!' );
-
-				writer.insert( writer.createPositionAt( regularContainerButton, 0 ), regularContainerButtonText );
-				writer.insert( writer.createPositionAt( regularContainer, 0 ), regularContainerInput );
-				writer.insert( writer.createPositionAt( regularContainer, 1 ), regularContainerButton );
-
-				writer.insert( writer.createPositionAt( widgetElement, 0 ), ignoredContainer );
-				writer.insert( writer.createPositionAt( widgetElement, 1 ), regularContainer );
-
-				return widgetElement;
+				return toWidget( widgetElement, writer );
 			}
+		} );
+
+		conversion.for( 'dataDowncast' ).elementToElement( {
+			model: 'simpleWidgetElement',
+			view: createView
 		} );
 
 		conversion.for( 'upcast' ).elementToElement( {
-			model: 'widgetElement',
+			model: 'simpleWidgetElement',
 			view: {
 				name: 'section',
-				classes: 'widget-element'
+				classes: 'simple-widget-element'
 			}
+		} );
+
+		function createView( modelElement, { writer } ) {
+			const simpleWidgetContainer = writer.createContainerElement( 'section', { class: 'simple-widget-container' } );
+			const simpleWidgetElement = writer.createRawElement( 'section', { class: 'simple-widget-element' }, domElement => {
+				domElement.innerHTML = `
+					<fieldset class="ignored-container" data-cke-ignore-events="true">
+						<legend>Ignored container with <strong>data-cke-ignore-events="true"</strong></legend>
+						<input type="text">
+						<button>Click!</button>
+					</fieldset>
+					<fieldset class="regular-container">
+						<legend>Regular container</legend>
+						<input type="text">
+						<button>Click!</button>
+					</fieldset>
+				`;
+			} );
+
+			writer.insert( writer.createPositionAt( simpleWidgetContainer, 0 ), simpleWidgetElement );
+
+			return simpleWidgetContainer;
+		}
+	}
+
+	_defineListener() {
+		this.editor.model.document.on( 'change', () => {
+			console.log( 'change event' );
+		} );
+		this.editor.model.document.on( 'change:data', () => {
+			console.log( 'change:data event' );
 		} );
 	}
 }
 
-class WidgetUI extends Plugin {
+class SimpleWidgetUI extends Plugin {
 	init() {
-		console.log( 'WidgetUI#init() got called' );
+		console.log( 'SimpleWidgetUI#init() got called' );
 	}
 }
 
-class Widget extends Plugin {
+class SimpleWidget extends Plugin {
 	static get requires() {
-		return [ WidgetEditing, WidgetUI ];
+		return [ SimpleWidgetEditing, SimpleWidgetUI ];
 	}
 }
 
 ClassicEditor
 	.create( document.querySelector( '#editor' ), {
-		plugins: [ Essentials, Widget ]
+		plugins: [ Essentials, SimpleWidget ]
 	} )
 	.then( editor => {
 		window.editor = editor;
