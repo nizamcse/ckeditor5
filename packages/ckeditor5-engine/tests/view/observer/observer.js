@@ -47,7 +47,7 @@ describe( 'Observer', () => {
 		} );
 	} );
 
-	describe( 'checkShouldIgnoreEventFromTarget', () => {
+	describe( 'checkShouldIgnoreEventFromTarget()', () => {
 		it( 'should not ignore on targets which are non-element node types', () => {
 			const observer = new Observer( {} );
 

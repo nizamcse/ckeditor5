@@ -22,8 +22,6 @@ describe( 'Widget - Events', () => {
 	beforeEach( async () => {
 		editorElement = createEditorElement();
 		editor = await createEditor( editorElement );
-
-		setModelData( editor.model, '[<simpleWidgetElement></simpleWidgetElement>]' );
 	} );
 
 	afterEach( () => {
@@ -56,6 +54,8 @@ describe( 'Widget - Events', () => {
 		return ClassicEditor
 			.create( element, {	plugins: [ simpleWidgetPlugin ]	} )
 			.then( editor => {
+				setModelData( editor.model, '[<simpleWidgetElement></simpleWidgetElement>]' );
+
 				const view = editor.editing.view;
 				const container = Array
 					.from( view.document.getRoot().getChildren() )
