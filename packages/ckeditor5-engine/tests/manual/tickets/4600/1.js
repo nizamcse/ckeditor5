@@ -128,27 +128,33 @@ ClassicEditor
 	.then( editor => {
 		window.editor = editor;
 
-		addListenerAndEmmiterForCustomEvent( editor, 'CUSTOM_EVENT' );
+		addListenerForCustomEvent( editor, 'CUSTOM_EVENT' );
+		addEmmitersForCustomEvent( editor, 'CUSTOM_EVENT' );
 	} )
 	.catch( error => {
 		console.error( error.stack );
 	} );
 
-function addListenerAndEmmiterForCustomEvent( editor, eventName ) {
+function addListenerForCustomEvent( editor, eventName ) {
 	const view = editor.editing.view;
 
-	const container = Array.from( view.document.getRoot().getChildren() )
-		.find( element => element.hasClass( 'simple-widget-container' ) );
-
-	container.on( eventName, () => {
+	view.document.on( eventName, () => {
 		console.log( `Received ${ eventName } event.` );
 	} );
+}
 
-	view.domConverter.viewToDom( container )
+function addEmmitersForCustomEvent( editor, eventName ) {
+	const view = editor.editing.view;
+	const container = Array
+		.from( view.document.getRoot().getChildren() )
+		.find( element => element.hasClass( 'simple-widget-container' ) );
+
+	view.domConverter
+		.viewToDom( container )
 		.querySelectorAll( 'button' )
 		.forEach( button => {
 			button.addEventListener( 'click', () => {
-				button.dispatchEvent( new Event( eventName ) );
+				button.dispatchEvent( new Event( eventName ), { bubbles: true } );
 				console.log( `Dispatched ${ eventName } event.` );
 			} );
 		} );
