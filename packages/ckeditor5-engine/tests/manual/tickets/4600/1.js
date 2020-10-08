@@ -128,22 +128,22 @@ ClassicEditor
 	.then( editor => {
 		window.editor = editor;
 
-		addListenerForCustomEvent( editor, 'CUSTOM_EVENT' );
-		addEmmitersForCustomEvent( editor, 'CUSTOM_EVENT' );
+		// addListenerForCustomEvent( editor, 'CUSTOM_EVENT' );
+		addEmmitersForButtons( editor, 'keyup' );
 	} )
 	.catch( error => {
 		console.error( error.stack );
 	} );
 
-function addListenerForCustomEvent( editor, eventName ) {
-	const view = editor.editing.view;
+// function addListenerForCustomEvent( editor, eventName ) {
+// 	const view = editor.editing.view;
 
-	view.document.on( eventName, () => {
-		console.log( `Received ${ eventName } event.` );
-	} );
-}
+// 	view.document.on( eventName, () => {
+// 		console.log( `Received ${ eventName } event.` );
+// 	} );
+// }
 
-function addEmmitersForCustomEvent( editor, eventName ) {
+function addEmmitersForButtons( editor, eventName ) {
 	const view = editor.editing.view;
 	const container = Array
 		.from( view.document.getRoot().getChildren() )
