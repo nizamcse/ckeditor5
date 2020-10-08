@@ -35,8 +35,8 @@ class SimpleWidgetEditing extends Plugin {
 		const schema = this.editor.model.schema;
 
 		schema.register( 'simpleWidgetElement', {
-			isObject: true,
-			allowWhere: '$block'
+			inheritAllFrom: '$block',
+			isObject: true
 		} );
 	}
 
@@ -46,7 +46,7 @@ class SimpleWidgetEditing extends Plugin {
 		conversion.for( 'editingDowncast' ).elementToElement( {
 			model: 'simpleWidgetElement',
 			view: ( modelElement, { writer } ) => {
-				const widgetElement = createView( modelElement, { writer } );
+				const widgetElement = createWidgetView( modelElement, { writer } );
 
 				return toWidget( widgetElement, writer );
 			}
@@ -54,7 +54,7 @@ class SimpleWidgetEditing extends Plugin {
 
 		conversion.for( 'dataDowncast' ).elementToElement( {
 			model: 'simpleWidgetElement',
-			view: createView
+			view: createWidgetView
 		} );
 
 		conversion.for( 'upcast' ).elementToElement( {
@@ -65,7 +65,7 @@ class SimpleWidgetEditing extends Plugin {
 			}
 		} );
 
-		function createView( modelElement, { writer } ) {
+		function createWidgetView( modelElement, { writer } ) {
 			const simpleWidgetContainer = writer.createContainerElement( 'section', { class: 'simple-widget-container' } );
 			const simpleWidgetElement = writer.createRawElement( 'div', { class: 'simple-widget-element' }, domElement => {
 				domElement.innerHTML = `
@@ -127,14 +127,13 @@ ClassicEditor
 	} )
 	.then( editor => {
 		window.editor = editor;
-
-		addEmmitersForButtons( editor, 'keyup' );
+		addEventDispatcherForButtons( editor, 'keyup' );
 	} )
 	.catch( error => {
 		console.error( error.stack );
 	} );
 
-function addEmmitersForButtons( editor, eventName ) {
+function addEventDispatcherForButtons( editor, eventName ) {
 	const view = editor.editing.view;
 	const container = Array
 		.from( view.document.getRoot().getChildren() )
