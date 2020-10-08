@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
-/* globals console, document, window */
+/* globals console, document, window, Event */
 
 import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
@@ -105,8 +105,8 @@ class SimpleWidgetEditing extends Plugin {
 			view.addObserver( observer );
 
 			events.forEach( eventName => {
-				this.listenTo( view.document, eventName, event => {
-					console.log( `Default observer captured ${ event.name } event.` );
+				this.listenTo( view.document, eventName, () => {
+					console.log( `Received ${ eventName } event.` );
 				} );
 			} );
 		} );
@@ -127,7 +127,29 @@ ClassicEditor
 	} )
 	.then( editor => {
 		window.editor = editor;
+
+		addListenerAndEmmiterForCustomEvent( editor, 'CUSTOM_EVENT' );
 	} )
 	.catch( error => {
 		console.error( error.stack );
 	} );
+
+function addListenerAndEmmiterForCustomEvent( editor, eventName ) {
+	const view = editor.editing.view;
+
+	const container = Array.from( view.document.getRoot().getChildren() )
+		.find( element => element.hasClass( 'simple-widget-container' ) );
+
+	container.on( eventName, () => {
+		console.log( `Received ${ eventName } event.` );
+	} );
+
+	view.domConverter.viewToDom( container )
+		.querySelectorAll( 'button' )
+		.forEach( button => {
+			button.addEventListener( 'click', () => {
+				button.dispatchEvent( new Event( eventName ) );
+				console.log( `Dispatched ${ eventName } event.` );
+			} );
+		} );
+}
