@@ -128,20 +128,11 @@ ClassicEditor
 	.then( editor => {
 		window.editor = editor;
 
-		// addListenerForCustomEvent( editor, 'CUSTOM_EVENT' );
 		addEmmitersForButtons( editor, 'keyup' );
 	} )
 	.catch( error => {
 		console.error( error.stack );
 	} );
-
-// function addListenerForCustomEvent( editor, eventName ) {
-// 	const view = editor.editing.view;
-
-// 	view.document.on( eventName, () => {
-// 		console.log( `Received ${ eventName } event.` );
-// 	} );
-// }
 
 function addEmmitersForButtons( editor, eventName ) {
 	const view = editor.editing.view;
@@ -154,7 +145,7 @@ function addEmmitersForButtons( editor, eventName ) {
 		.querySelectorAll( 'button' )
 		.forEach( button => {
 			button.addEventListener( 'click', () => {
-				button.dispatchEvent( new Event( eventName ), { bubbles: true } );
+				button.dispatchEvent( new Event( eventName, { bubbles: true } ) );
 				console.log( `Dispatched ${ eventName } event.` );
 			} );
 		} );
