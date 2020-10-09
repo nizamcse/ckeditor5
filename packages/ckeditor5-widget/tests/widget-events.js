@@ -15,7 +15,7 @@ import testUtils from '@ckeditor/ckeditor5-core/tests/_utils/utils';
 
 describe( 'Widget - Events', () => {
 	const EVENT_NAME = 'keyup';
-	let editor, editorElement, fakeEventCallback, buttonIgnored, buttonRegular;
+	let editor, editorElement, eventCallback, buttonIgnored, buttonRegular;
 
 	testUtils.createSinonSandbox();
 
@@ -35,36 +35,34 @@ describe( 'Widget - Events', () => {
 	it( 'should not ignore events from child inside parent without the `data-cke-ignore-events` attribute', () => {
 		buttonRegular.dispatchEvent( new Event( EVENT_NAME, { bubbles: true } ) );
 
-		expect( fakeEventCallback.callCount ).to.equal( 1 );
+		expect( eventCallback.callCount ).to.equal( 1 );
 	} );
 
 	it( 'should ignore events from child inside parent with the `data-cke-ignore-events` attribute', () => {
 		buttonIgnored.dispatchEvent( new Event( EVENT_NAME, { bubbles: true } ) );
 
-		expect( fakeEventCallback.callCount ).to.equal( 0 );
+		expect( eventCallback.callCount ).to.equal( 0 );
 	} );
 
 	function createEditorElement() {
-		const element = document.createElement( 'div' );
-		document.body.appendChild( element );
-		return element;
+		return document.body.appendChild( document.createElement( 'div' ) );
 	}
 
-	function createEditor( element ) {
-		return ClassicEditor
-			.create( element, {	plugins: [ simpleWidgetPlugin ]	} )
-			.then( editor => {
-				setModelData( editor.model, '[<simpleWidgetElement></simpleWidgetElement>]' );
+	async function createEditor( element ) {
+		const editor = await ClassicEditor.create( element, { plugins: [ simpleWidgetPlugin ] } );
 
-				const view = editor.editing.view;
-				const container = Array
-					.from( view.document.getRoot().getChildren() )
-					.find( element => element.hasClass( 'simple-widget-container' ) );
-				const domFragment = view.domConverter.viewToDom( container );
+		setModelData( editor.model, '[<simpleWidgetElement></simpleWidgetElement>]' );
 
-				buttonIgnored = domFragment.querySelector( '#ignored-button' );
-				buttonRegular = domFragment.querySelector( '#regular-button' );
-			} );
+		const container = Array
+			.from( editor.editing.view.document.getRoot().getChildren() )
+			.find( element => element.hasClass( 'simple-widget-container' ) );
+
+		const domFragment = editor.editing.view.domConverter.viewToDom( container );
+
+		buttonIgnored = domFragment.querySelector( '#ignored-button' );
+		buttonRegular = domFragment.querySelector( '#regular-button' );
+
+		return editor;
 	}
 
 	function simpleWidgetPlugin( editor ) {
@@ -125,10 +123,10 @@ describe( 'Widget - Events', () => {
 		}
 
 		function addObserver( editor ) {
-			fakeEventCallback = sinon.fake();
+			eventCallback = sinon.fake();
 
 			editor.editing.view.addObserver( KeyObserver );
-			editor.editing.view.document.on( EVENT_NAME, fakeEventCallback );
+			editor.editing.view.document.on( EVENT_NAME, eventCallback );
 		}
 	}
 } );

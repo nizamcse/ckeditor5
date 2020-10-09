@@ -144,8 +144,8 @@ function addEventDispatcherForButtons( editor, eventName ) {
 		.querySelectorAll( 'button' )
 		.forEach( button => {
 			button.addEventListener( 'click', () => {
-				button.dispatchEvent( new Event( eventName, { bubbles: true } ) );
 				console.log( `Dispatched ${ eventName } event.` );
+				button.dispatchEvent( new Event( eventName, { bubbles: true } ) );
 			} );
 		} );
 }
