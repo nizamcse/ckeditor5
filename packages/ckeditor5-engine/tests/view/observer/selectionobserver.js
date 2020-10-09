@@ -24,7 +24,7 @@ describe( 'SelectionObserver', () => {
 		domRoot.innerHTML = `
 			<div contenteditable="true"></div>
 			<div contenteditable="true" id="additional"></div>
-			<div contenteditable="true" id="ignored" data-cke-ignore-events="true"></div>
+			<div contenteditable="true" id="ignored" data-cke-ignore-events="true">Text node</div>
 		`.replace( /[\n\t]/g, '' );
 		domMain = domRoot.childNodes[ 0 ];
 		domDocument.body.appendChild( domRoot );
@@ -100,14 +100,20 @@ describe( 'SelectionObserver', () => {
 	} );
 
 	it( 'should not fire selectionChange for ignored target', done => {
-		const viewElement = view.domConverter.domToView( domDocument.getElementById( 'ignored' ) );
+		const range = document.createRange();
+		const referenceTextNode = domDocument.getElementById( 'ignored' ).childNodes[ 0 ];
+
+		range.setStart( referenceTextNode, 0 );
+		range.setEnd( referenceTextNode, 5 );
+
+		const domSelection = document.getSelection();
+
+		domSelection.removeAllRanges();
+		domSelection.addRange( range );
+
 		const spy = sinon.spy();
 
 		viewDocument.on( 'selectionChange', spy );
-
-		view.change( writer => {
-			writer.setSelection( viewElement, 0 );
-		} );
 
 		setTimeout( () => {
 			expect( spy.called ).to.be.false;
